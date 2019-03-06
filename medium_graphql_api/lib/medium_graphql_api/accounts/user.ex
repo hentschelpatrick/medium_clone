@@ -1,5 +1,6 @@
 defmodule MediumGraphqlApi.Accounts.User do
   use Ecto.Schema
+
   import Ecto.Changeset
 
   schema "users" do
@@ -25,6 +26,17 @@ defmodule MediumGraphqlApi.Accounts.User do
     |> validate_confirmation(:password, :password_confirmation)
     |> unique_constraint(:email)
     |> hash_password
+  end
+
+  defp hash_password(
+         %Ecto.Changeset{
+           valid?: true,
+           changes: %{
+             password: password
+           }
+         } = changeset
+       ) do
+    change(changeset, Comeonin.Argon2.add_hash(password))
   end
 
   defp hash_password(changeset) do
